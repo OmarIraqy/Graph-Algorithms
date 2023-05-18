@@ -76,15 +76,61 @@ class Graph():
         self.MIN_HEAPIFY(0)
         return min
 
-        
-        
+    def primMST(self):
+        weights = [100000]*self.verticesCount
+        parent = [None] * self.verticesCount
+
+        weights[0]=0
+        mstSet=[False] * self.verticesCount
+
+        #set as root
+        parent[0]= -1
+
+        for cout in range (self.verticesCount):
+            #find edge with smallest weight
+            u=self.minWeight(weights,mstSet)
+
+            mstSet[u]=True
+
+            for v in range(self.verticesCount):
+                if self.graph[u][v] > 0 and mstSet[v]== False  and weights[v]>self.graph[u][v]:
+                    weights[v]=self.graph[u][v]
+                    parent[v]=u
+        self.printMST(parent)
+
+    def minWeight(self,weight,mstSet):
+
+        min = 10000000
+
+        for v in range(self.verticesCount):
+            if weight[v] < min and mstSet[v] == False:
+                min = weight[v]
+                min_index = v
+
+        return min_index
+
+    def printMST(self, parent):
+        print("Edge \tWeight")
+        for i in range(1, self.verticesCount):
+            print(parent[i], "-", i, "\t", self.graph[i][parent[i]])
+
 
 #Test 
-G=Graph()
-G._init_(4,True)
-G.addEdge(0,1,100)
-G.addEdge(0,2,1)
-G.addEdge(2,3,1)
-G.addEdge(1,3,200)
-G.shortestPath(0)
+# G=Graph()
+# G._init_(4,True)
+# G.addEdge(0,1,100)
+# G.addEdge(0,2,1)
+# G.addEdge(2,3,1)
+# G.addEdge(1,3,200)
+# G.shortestPath(0)
 
+if __name__ == '__main__':
+    g = Graph()
+    g._init_(5,False)
+    g.graph = [[0, 2, 0, 6, 0],
+               [2, 0, 3, 8, 5],
+               [0, 3, 0, 0, 7],
+               [6, 8, 0, 0, 9],
+               [0, 5, 7, 9, 0]]
+
+    g.primMST()
