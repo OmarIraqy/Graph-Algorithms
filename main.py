@@ -32,24 +32,33 @@ class Graph():
             vertex._init_(v)
             self.verticesList.append(vertex)
         self.verticesList[startIndex].modify(0,None)
+        
 
     def Relax(self,minVertex,destination):
         if destination.distance>minVertex.distance+self.Weight(minVertex,destination):
-            destination.distance=minVertex.distance+self.Weight(minVertex,destination)
-            destination.predecessor=minVertex
+            destination.modify(minVertex.distance+self.Weight(minVertex,destination),minVertex)
+            return True
+ 
 
         
     def shortestPath(self,startIndex):
+        path=[]
         counter=self.verticesCount
         self.initializeSource(startIndex)
         self.BUILD_MIN_HEAP()
         while self.verticesCount != 0:
             minVertex=self.ExtractMin()
             for i in range(counter):
-                if self.graph[minVertex.index][i] !=0:
-                    self.Relax(minVertex,self.verticesList[i])
-        for i in range(counter):
-            print(f"Vertex index {i} has distance= {self.verticesList[i].distance}  and Predecessor index {self.verticesList[i].predecessor.index}")
+                if self.graph[minVertex.index][i] !=0 and i!=minVertex.index:
+                    if self.Relax(minVertex,self.verticesList[i]):
+                        path.append(minVertex)
+                        if len(path)>1 and path[len(path)-2].index==minVertex.index:
+                            path.pop()
+        print("Shortest :")
+        for i in range(len(path)):
+            print(f"index --> {path[i].index}")
+        print(f"index --> {counter-1}")
+        
 
 
     def MIN_HEAPIFY(self, i):
@@ -67,6 +76,7 @@ class Graph():
     def BUILD_MIN_HEAP(self):
         for i in range(self.verticesCount // 2 - 1, -1, -1):
             self.MIN_HEAPIFY(i)
+        
 
     def ExtractMin(self):
         min=self.verticesList[0]
