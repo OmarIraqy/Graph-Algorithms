@@ -1,15 +1,90 @@
+from heapq import heapify, heappush, heappop
+class Vertex():
+    def _init_(self,index):
+        self.distance=float('inf') 
+        self.predecessor=None
+        self.index=index
+
+    def modify(self,distance,predecessor):
+        self.distance=distance
+        self.predecessor=predecessor
+    
 class Graph():
-    def _init_(self, vertices):
-        self.V = vertices
+   
+    def _init_(self, vertices,directed):#directed = True if it is directed graph, 0 otherwise
+        self.verticesCount=vertices
+        self.directed=directed
         self.graph = [[0 for column in range(vertices)]
                       for row in range(vertices)]
+        self.verticesList=[]
+    
     def addEdge(self,i,j,weight):
         self.graph[i][j]=weight
-        print(self.graph)
+        if self.directed==False:
+            self.graph[j][i]=weight
+    
+    def Weight(self,current,destination):
+        return self.graph[current.index][destination.index]
+
+    def initializeSource(self,startIndex):
+        for v in range(self.verticesCount):
+            vertex=Vertex()
+            vertex._init_(v)
+            self.verticesList.append(vertex)
+        self.verticesList[startIndex].modify(0,None)
+
+    def Relax(self,minVertex,destination):
+        if destination.distance>minVertex.distance+self.Weight(minVertex,destination):
+            destination.distance=minVertex.distance+self.Weight(minVertex,destination)
+            destination.predecessor=minVertex
+
+        
+    def shortestPath(self,startIndex):
+        counter=self.verticesCount
+        self.initializeSource(startIndex)
+        self.BUILD_MIN_HEAP()
+        while self.verticesCount != 0:
+            minVertex=self.ExtractMin()
+            for i in range(counter):
+                if self.graph[minVertex.index][i] !=0:
+                    self.Relax(minVertex,self.verticesList[i])
+        for i in range(counter):
+            print(f"Vertex index {i} has distance= {self.verticesList[i].distance}  and Predecessor index {self.verticesList[i].predecessor.index}")
+
+
+    def MIN_HEAPIFY(self, i):
+        right = 2 * i + 2
+        left = 2 * i + 1
+        largest = i
+        if left < self.verticesCount and self.verticesList[left].distance < self.verticesList[largest].distance:
+            largest = left
+        if right < self.verticesCount and self.verticesList[right].distance < self.verticesList[largest].distance:
+            largest = right
+        if largest != i:
+            self.verticesList[i], self.verticesList[largest] = self.verticesList[largest], self.verticesList[i]
+            self.MIN_HEAPIFY(largest)
+
+    def BUILD_MIN_HEAP(self):
+        for i in range(self.verticesCount // 2 - 1, -1, -1):
+            self.MIN_HEAPIFY(i)
+
+    def ExtractMin(self):
+        min=self.verticesList[0]
+        lastVertex= self.verticesList[self.verticesCount - 1]
+        self.verticesList[0] = lastVertex
+        self.verticesCount = self.verticesCount - 1
+        self.MIN_HEAPIFY(0)
+        return min
+
+        
         
 
-#Test init
+#Test 
 G=Graph()
-G._init_(3)
-G.addEdge(1,2,5)
+G._init_(4,True)
+G.addEdge(0,1,100)
+G.addEdge(0,2,1)
+G.addEdge(2,3,1)
+G.addEdge(1,3,200)
+G.shortestPath(0)
 
