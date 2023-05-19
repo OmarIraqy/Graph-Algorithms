@@ -40,9 +40,9 @@ class Graph():
 
     def Relax(self,minVertex,destination):
         if destination.distance>minVertex.distance+self.Weight(minVertex,destination):
-            
+
             destination.modify(minVertex.distance+self.Weight(minVertex,destination),minVertex)
-            # print(f"new distance of {destination.index} is {destination.distance}")
+
 
  
 
@@ -82,14 +82,14 @@ class Graph():
     def MIN_HEAPIFY(self, i):
         right = 2 * i + 2
         left = 2 * i + 1
-        largest = i
-        if left < self.verticesCount and self.verticesList[left].distance < self.verticesList[largest].distance:
-            largest = left
-        if right < self.verticesCount and self.verticesList[right].distance < self.verticesList[largest].distance:
-            largest = right
-        if largest != i:
-            self.verticesList[i], self.verticesList[largest] = self.verticesList[largest], self.verticesList[i]
-            self.MIN_HEAPIFY(largest)
+        smallest = i
+        if left < self.verticesCount and self.verticesList[left].distance < self.verticesList[smallest].distance:
+            smallest = left
+        if right < self.verticesCount and self.verticesList[right].distance < self.verticesList[smallest].distance:
+            smallest = right
+        if smallest != i:
+            self.verticesList[i], self.verticesList[smallest] = self.verticesList[smallest], self.verticesList[i]
+            self.MIN_HEAPIFY(smallest)
 
     def BUILD_MIN_HEAP(self):
         for i in range(self.verticesCount // 2 - 1, -1, -1):
@@ -148,7 +148,7 @@ class Graph():
 
 #Test 
 G=Graph()
-G._init_(5,False)
+G._init_(4,True)
 
 # G.addEdge(0,1,1)
 # G.addEdge(0,2,6)
@@ -159,14 +159,19 @@ G._init_(5,False)
 # G.addEdge(3,4,5)
 # G.shortestPath(0,4)
 
-G.addEdge(0,1,6)
-G.addEdge(0,3,1)
-G.addEdge(1,3,2)
-G.addEdge(1,2,5)
-G.addEdge(3,4,1)
-G.addEdge(1,4,2)
-G.addEdge(2,4,5)
-G.shortestPath(0,2)
+# G.addEdge(0,1,6)
+# G.addEdge(0,3,1)
+# G.addEdge(1,3,2)
+# G.addEdge(1,2,5)
+# G.addEdge(3,4,1)
+# G.addEdge(1,4,2)
+# G.addEdge(2,4,5)
+# G.shortestPath(0,4)
+G.addEdge(0,1,100)
+G.addEdge(0,2,1)
+G.addEdge(1,3,100)
+G.addEdge(2,3,1)
+G.shortestPath(0,3)
 
 #     g = Graph()
 #     g._init_(5,False)
