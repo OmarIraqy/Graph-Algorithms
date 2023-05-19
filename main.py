@@ -1,150 +1,102 @@
+import sys
 from heapq import heapify, heappush, heappop
-class Vertex():
-    def _init_(self,index):
-        self.distance=float('inf') 
-        self.predecessor=None
-        self.index=index
 
-    def modify(self,distance,predecessor):
-        self.distance=distance
-        self.predecessor=predecessor
-    
 class Graph():
-   
-    def _init_(self, vertices,directed):#directed = True if it is directed graph, 0 otherwise
-        self.verticesCount=vertices
-        self.directed=directed
+
+    def init(self, vertices, directed):  # directed = True if it is directed graph, 0 otherwise
+        self.verticesCount = vertices
+        self.directed = directed
         self.graph = [[0 for column in range(vertices)]
                       for row in range(vertices)]
-        self.verticesList=[]
-    
-    def addEdge(self,i,j,weight):
-        self.graph[i][j]=weight
-        if self.directed==False:
-            self.graph[j][i]=weight
-    
-    def Weight(self,current,destination):
-        return self.graph[current.index][destination.index]
+        self.verticesList = []
 
-    def initializeSource(self,startIndex):
-        for v in range(self.verticesCount):
-            vertex=Vertex()
-            vertex._init_(v)
-            self.verticesList.append(vertex)
-        self.verticesList[startIndex].modify(0,None)
-        
+    def addEdge(self, i, j, weight):
+        self.graph[i][j] = weight
+        if self.directed == False:
+            self.graph[j][i] = weight
 
-    def Relax(self,minVertex,destination):
-        if destination.distance>minVertex.distance+self.Weight(minVertex,destination):
-            destination.modify(minVertex.distance+self.Weight(minVertex,destination),minVertex)
-            if self.directed==False:
-                destination.modify(minVertex.distance+self.Weight(minVertex,destination),minVertex)
-            return True
- 
+    def dijkstra(self, src):
 
-        
-    def shortestPath(self,startIndex):
-        path=[]
-        counter=self.verticesCount   
-        self.initializeSource(startIndex)
-        self.BUILD_MIN_HEAP()
-        while self.verticesCount != 0:
-            minVertex=self.ExtractMin()
-            path.append(minVertex)
-            for i in range(counter):
-                if self.graph[minVertex.index][i] !=0:
-                    self.Relax(minVertex,self.verticesList[i])
-        
-                        
-                        
-        # print("Shortest :")
-        for i in range(len(path)):
-            print(f"index --> {path[i].index}   distance {path[i].distance}")
+        # Creating predecssor array to carry predessor of every index
+        pred = [None] * self.verticesCount
+        # Creating distance array to carry distance of every index from source
+        dist = [sys.maxsize] * self.verticesCount
+        #Setting distance from source to the source node to zero
+        dist[src] = 0
+        # Initilaizing a visited vertices array
+        visited = [False] * self.verticesCount
 
+        for i in range(self.verticesCount):
 
-    def MIN_HEAPIFY(self, i):
-        right = 2 * i + 2
-        left = 2 * i + 1
-        largest = i
-        if left < self.verticesCount and self.verticesList[left].distance < self.verticesList[largest].distance:
-            largest = left
-        if right < self.verticesCount and self.verticesList[right].distance < self.verticesList[largest].distance:
-            largest = right
-        if largest != i:
-            self.verticesList[i], self.verticesList[largest] = self.verticesList[largest], self.verticesList[i]
-            self.MIN_HEAPIFY(largest)
+            # x is always equal to src in first iteration
+            x = self.minWeight(dist, visited)
 
-    def BUILD_MIN_HEAP(self):
-        for i in range(self.verticesCount // 2 - 1, -1, -1):
-            self.MIN_HEAPIFY(i)
-        
+            # Add the minimum distance vertex in the Shortest path tree
+            visited[x] = True
 
-    def ExtractMin(self):
-        min=self.verticesList[0]
-        lastVertex= self.verticesList[self.verticesCount - 1]
-        self.verticesList[0] = lastVertex
-        self.verticesCount = self.verticesCount - 1
-        self.MIN_HEAPIFY(0)
-        return min
+            # Update dist value of the adjacent vertices and setting its predecessor
+            for y in range(self.verticesCount):
+                if self.graph[x][y] > 0 and visited[y] == False and dist[y] > dist[x] + self.graph[x][y]:
+                    dist[y] = dist[x] + self.graph[x][y]
+                    pred[y]=x
+
+        self.printSPT(dist,pred)
+
+    def printSPT(self, dist,pred):
+        for node in range(self.verticesCount):
+            print("Vertix",node, "\t Distance from Source = ", dist[node],"\t Predecessor is  ",pred[node])
 
     def primMST(self):
         weights = [100000]*self.verticesCount
-        parent = [None] * self.verticesCount
+        pred = [None] * self.verticesCount
 
         weights[0]=0
-        mstSet=[False] * self.verticesCount
+        visited=[False] * self.verticesCount
 
         #set as root
-        parent[0]= -1
+        pred[0]= -1
 
         for cout in range (self.verticesCount):
             #find edge with smallest weight
-            u=self.minWeight(weights,mstSet)
+            u=self.minWeight(weights,visited)
 
-            mstSet[u]=True
+            #Set Vertix as Visited
+            visited[u]=True
 
+            # Update the distance to reach adjecent Vertices and setting its predecessor
             for v in range(self.verticesCount):
-                if self.graph[u][v] > 0 and mstSet[v]== False  and weights[v]>self.graph[u][v]:
+                if self.graph[u][v] > 0 and visited[v]== False  and weights[v]>self.graph[u][v]:
                     weights[v]=self.graph[u][v]
-                    parent[v]=u
-        self.printMST(parent)
+                    pred[v]=u
+        self.printMST(pred)
 
-    def minWeight(self,weight,mstSet):
+    def minWeight(self,weight,visited):
 
         min = 10000000
 
         for v in range(self.verticesCount):
-            if weight[v] < min and mstSet[v] == False:
+            if weight[v] < min and visited[v] == False:
                 min = weight[v]
                 min_index = v
 
         return min_index
 
-    def printMST(self, parent):
+    def printMST(self, pred):
         print("Edge \tWeight")
         for i in range(1, self.verticesCount):
-            print(parent[i], "-", i, "\t", self.graph[i][parent[i]])
+            print(pred[i], "-", i, "\t", self.graph[i][pred[i]])
 
 
 #Test 
 G=Graph()
-G._init_(5,True)
-G.addEdge(0,1,1)
-G.addEdge(0,2,6)
-G.addEdge(1,2,2)
-G.addEdge(1,3,1)
-G.addEdge(2,3,2)
+G.init(5,False)
+G.addEdge(0,3,1)
+G.addEdge(0,1,6)
+G.addEdge(1,4,2)
+G.addEdge(1,2,5)
+G.addEdge(1,3,2)
 G.addEdge(2,4,5)
-G.addEdge(3,4,5)
-G.shortestPath(0)
+G.addEdge(3,4,1)
+G.dijkstra(0)
+G.primMST()
 
-# if __name__ == '__main__':
-#     g = Graph()
-#     g._init_(5,False)
-#     g.graph = [[0, 2, 0, 6, 0],
-#                [2, 0, 3, 8, 5],
-#                [0, 3, 0, 0, 7],
-#                [6, 8, 0, 0, 9],
-#                [0, 5, 7, 9, 0]]
-
-#     g.primMST()
