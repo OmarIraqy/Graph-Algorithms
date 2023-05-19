@@ -43,22 +43,21 @@ class Graph():
         
     def shortestPath(self,startIndex):
         path=[]
-        counter=self.verticesCount
+        counter=self.verticesCount   
         self.initializeSource(startIndex)
         self.BUILD_MIN_HEAP()
         while self.verticesCount != 0:
             minVertex=self.ExtractMin()
+            path.append(minVertex)
             for i in range(counter):
-                if self.graph[minVertex.index][i] !=0 and i!=minVertex.index:
-                    if self.Relax(minVertex,self.verticesList[i]):
-                        path.append(minVertex)
-                        if len(path)>1 and path[len(path)-2].index==minVertex.index:
-                            path.pop()
-        print("Shortest :")
-        for i in range(len(path)):
-            print(f"index --> {path[i].index}")
-        print(f"index --> {counter-1}")
+                if self.graph[minVertex.index][i] !=0:
+                    self.Relax(minVertex,self.verticesList[i])
         
+                        
+                        
+        # print("Shortest :")
+        for i in range(len(path)):
+            print(f"index --> {path[i].index}   distance {path[i].distance}")
 
 
     def MIN_HEAPIFY(self, i):
@@ -126,21 +125,24 @@ class Graph():
 
 
 #Test 
-# G=Graph()
-# G._init_(4,True)
-# G.addEdge(0,1,100)
-# G.addEdge(0,2,1)
-# G.addEdge(2,3,1)
-# G.addEdge(1,3,200)
-# G.shortestPath(0)
+G=Graph()
+G._init_(5,True)
+G.addEdge(0,1,1)
+G.addEdge(0,2,6)
+G.addEdge(1,2,2)
+G.addEdge(1,3,1)
+G.addEdge(2,3,2)
+G.addEdge(2,4,5)
+G.addEdge(3,4,5)
+G.shortestPath(0)
 
-if __name__ == '__main__':
-    g = Graph()
-    g._init_(5,False)
-    g.graph = [[0, 2, 0, 6, 0],
-               [2, 0, 3, 8, 5],
-               [0, 3, 0, 0, 7],
-               [6, 8, 0, 0, 9],
-               [0, 5, 7, 9, 0]]
+# if __name__ == '__main__':
+#     g = Graph()
+#     g._init_(5,False)
+#     g.graph = [[0, 2, 0, 6, 0],
+#                [2, 0, 3, 8, 5],
+#                [0, 3, 0, 0, 7],
+#                [6, 8, 0, 0, 9],
+#                [0, 5, 7, 9, 0]]
 
-    g.primMST()
+#     g.primMST()
