@@ -37,6 +37,8 @@ class Graph():
     def Relax(self,minVertex,destination):
         if destination.distance>minVertex.distance+self.Weight(minVertex,destination):
             destination.modify(minVertex.distance+self.Weight(minVertex,destination),minVertex)
+            if self.directed==False:
+                destination.modify(minVertex.distance+self.Weight(minVertex,destination),minVertex)
             return True
  
 
