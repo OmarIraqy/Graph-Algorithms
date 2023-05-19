@@ -1,5 +1,5 @@
 import sys
-from heapq import heapify, heappush, heappop
+import heapq
 
 class Graph():
 
@@ -18,68 +18,89 @@ class Graph():
     def dijkstra(self, src):
 
         # Creating predecssor array to carry predessor of every index
-        pred = [None] * self.verticesCount
+        predecessor = [-1] * self.verticesCount
+
         # Creating distance array to carry distance of every index from source
-        dist = [sys.maxsize] * self.verticesCount
+        distance = [sys.maxsize] * self.verticesCount
+
         #Setting distance from source to the source node to zero
-        dist[src] = 0
+        distance[src] = 0
+
         # Initilaizing a visited vertices array
         visited = [False] * self.verticesCount
 
-        for i in range(self.verticesCount):
+        # Setting distance of source vertex as zero
+        heap = [(0, src)]
 
-            # x is always equal to src in first iteration
-            x = self.minWeight(dist, visited)
 
-            # Add the minimum distance vertex in the Shortest path tree
-            visited[x] = True
+        while heap:
+            #Popping vertex with smallest distance
+            (dist, u) = heapq.heappop(heap)
 
-            # Update dist value of the adjacent vertices and setting its predecessor
-            for y in range(self.verticesCount):
-                if self.graph[x][y] > 0 and visited[y] == False and dist[y] > dist[x] + self.graph[x][y]:
-                    dist[y] = dist[x] + self.graph[x][y]
-                    pred[y]=x
+            #if already visited skip
+            if visited[u]:
+                continue
 
-        self.printSPT(dist,pred)
+            #Set vertex as visited
+            visited[u] = True
+
+            #Update distance and predecessor of the Vertex
+            for v in range(self.verticesCount):
+                if self.graph[u][v] > 0 and not visited[v]:
+                    new_distance = distance[u] + self.graph[u][v]
+                    if new_distance < distance[v]:
+                        distance[v] = new_distance
+                        predecessor[v] = u
+                        heapq.heappush(heap, (distance[v], v))
+
+        #Printing the Distance from source to Each vertex and the predecessors of each vertex
+        self.printSPT(distance,predecessor)
+
+
 
     def printSPT(self, dist,pred):
         for node in range(self.verticesCount):
             print("Vertix",node, "\t Distance from Source = ", dist[node],"\t Predecessor is  ",pred[node])
 
     def primMST(self):
-        weights = [100000]*self.verticesCount
-        pred = [None] * self.verticesCount
+        #Setting distance to reach each Vertex to infinity
+        distance = [sys.maxsize]*self.verticesCount
 
-        weights[0]=0
+        #Making array of predecessors all none for starters
+        predecessor = [None] * self.verticesCount
+
+        #Settting distance to reach first node as o
+        distance[0]=0
+
+        #Making array of visisted to check if a vertex has been visited or not
         visited=[False] * self.verticesCount
 
-        #set as root
-        pred[0]= -1
+        #set first vertex as root (Deosn't have a predecessor)
+        predecessor[0]= -1
 
-        for cout in range (self.verticesCount):
-            #find edge with smallest weight
-            u=self.minWeight(weights,visited)
+        #Pushing (distance , first vertex) in the heap
+        heap = [(0, 0)]
 
-            #Set Vertix as Visited
-            visited[u]=True
+        while heap:
+            #pop vertex with smallest distance
+            (dist, u) = heapq.heappop(heap)
 
-            # Update the distance to reach adjecent Vertices and setting its predecessor
+            #Check if its visited
+            if visited[u]:
+                continue
+
+            #Set vertex as visited
+            visited[u] = True
+
+            #Update the vertex distance to reach the vertex and its predecessor
             for v in range(self.verticesCount):
-                if self.graph[u][v] > 0 and visited[v]== False  and weights[v]>self.graph[u][v]:
-                    weights[v]=self.graph[u][v]
-                    pred[v]=u
-        self.printMST(pred)
+                if self.graph[u][v] > 0 and not visited[v] and distance[v]>self.graph[u][v]:
+                    distance[v] =  self.graph[u][v]
+                    predecessor[v] = u
+                    heapq.heappush(heap, (distance[v], v))
 
-    def minWeight(self,weight,visited):
-
-        min = 10000000
-
-        for v in range(self.verticesCount):
-            if weight[v] < min and visited[v] == False:
-                min = weight[v]
-                min_index = v
-
-        return min_index
+        #Functuon to print Edges and Weights
+        self.printMST(predecessor)
 
     def printMST(self, pred):
         print("Edge \tWeight")
